@@ -1,0 +1,17 @@
+a implementar:
+
+dispersion abierta. encajan todos los sinónimos que se quieran (array de listas)
+dispersion cerrada. encajan cierto numero de sinonimos (array de arrays).
+
+clase template<Key> DispersionFunction (se implementan MOD, SUM y PSEUDO).
+
+clase abstracta template<Key> ExplorationFunction (se implementan LINEAL, CUADRÁTICA, Doble Dispersion y Redispersion).
+Las funciones f(k) y f^(i)(k) son funciones de dispersión adecuadas para generar un valor de desplazamiento en el rango [1..tableSize-1].
+
+clase template<Key> Sequence (implementa clase DynamicSq(caso abierto), clase StaticSq(caso cerrado))
+
+TENER EN CUENTA QUE STATIC, MÉTODO ISFULL NO ES ABSTRACTO NI HAY QUE USAR VIRTUAL. LA CLASE STATIC NO ES ABSTRACTA
+
+clase template<class Key, class Container=StaticSq<Key>> TableHash: public Sequence<Key> (por defecto funciona de manera cerrada (static)).
+
+La clave para crear el programa principal es un objeto NIF. el constructor por defecto genera un NIF aleatorio. Se necesitan operadores de comparación para verificar la existencia del mismo NIF.
