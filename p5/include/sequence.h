@@ -31,9 +31,12 @@ class StaticSequence : public Sequence<Key> {
  public:
   StaticSequence(size_t size);
 
+  size_t getSize() const;
+
   bool search(const Key& k) const override;
   bool insert(const Key& k) override;
   bool isFull() const override;
+
   Key operator[](const Position&) const override;
 
  private:
@@ -49,6 +52,15 @@ class StaticSequence : public Sequence<Key> {
  */
 template <class Key>
 StaticSequence<Key>::StaticSequence(size_t size) : size_(size), keys_(size) {}
+
+/**
+ * @brief Retorna el tamaño de la secuencia.
+ *
+ * @tparam Key
+ * @return size_t
+ */
+template <class Key>
+size_t StaticSequence<Key>::getSize() const { return size_; }
 
 /**
  * @brief Busca una clave en la secuencia.
