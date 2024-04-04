@@ -40,6 +40,17 @@ bool Nif::operator==(const Nif& other) const {
 }
 
 /**
+ * @brief Sobrecarga del operador de comparación de igualdad
+ * 
+ * @param other  Nif con el que comparar
+ * @return true Si el Nif es igual al valor
+ * @return false Si el Nif es distinto al valor
+ */
+bool Nif::operator==(const int& other) const {
+  return this->value_ == other;
+}
+
+/**
  * @brief Sobrecarga del operador de comparación de desigualdad
  * 
  * @param other  Nif con el que comparar
@@ -48,6 +59,17 @@ bool Nif::operator==(const Nif& other) const {
  */
 bool Nif::operator!=(const int& other) const {
   return this->value_ != other;
+}
+
+/**
+ * @brief Sobrecarga del operador de comparación de desigualdad
+ * 
+ * @param other  Nif con el que comparar
+ * @return true Si los Nif son distintos
+ * @return false Si los  Nif son iguales
+ */
+bool Nif::operator!=(const Nif& other) const {
+  return this->value_ != other.value_;
 }
 
 /**
@@ -62,6 +84,17 @@ bool Nif::operator<(const  Nif& other) const {
 }
 
 /**
+ * @brief Sobrecarga del operador de comparación de menor que
+ * 
+ * @param other  Nif con el que comparar
+ * @return true Si el  Nif es menor que el otro
+ * @return false Si el Nif es mayor o igual que el otro
+ */
+bool Nif::operator<(const int& other) const {
+  return this->value_ < other;
+}
+
+/**
  * @brief Sobrecarga del operador de comparación de mayor que
  * 
  * @param other  Nif con el que comparar
@@ -70,6 +103,17 @@ bool Nif::operator<(const  Nif& other) const {
  */
 bool Nif::operator>(const  Nif& other) const {
   return this->value_ > other.value_;
+}
+
+/**
+ * @brief Sobrecarga del operador de comparación de mayor que
+ * 
+ * @param other  Nif con el que comparar
+ * @return true Si el  Nif es mayor que el otro
+ * @return false Si el Nif es menor o igual que el otro
+ */
+bool Nif::operator>(const int& other) const {
+  return this->value_ > other;
 }
 
 /**
@@ -112,4 +156,25 @@ Nif Nif::operator/=(const int& other) {
  */
 Nif::operator long() const {
   return value_;
+}
+
+/**
+ * @brief Devuelve el valor del Nif
+ * 
+ * @return long Valor del Nif
+ */
+long Nif::getValue() const {
+  return value_;
+}
+
+/**
+ * @brief Sobrecarga del operador de salida
+ * 
+ * @param os Stream de salida
+ * @param nif  Nif a mostrar
+ * @return std::ostream& Referencia al stream de salida
+ */
+std::ostream& operator<<(std::ostream& os, const Nif& nif) {
+  os << nif.value_;
+  return os;
 }

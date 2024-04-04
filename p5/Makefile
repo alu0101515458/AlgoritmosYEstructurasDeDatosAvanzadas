@@ -1,8 +1,8 @@
 CXX = g++
-CXXFLAGS = -Wall -Werror -Wextra -pedantic -std=c++17
+CXXFLAGS = -Wall -Werror -Wextra -pedantic -std=c++17 -fmax-errors=1 -g
 LDFLAGS =
 
-SRC = src/main.cc
+SRC = src/nif.cc src/main.cc
 OBJ = $(SRC:src/%.cc=build/%.o)
 EXEC = program
 

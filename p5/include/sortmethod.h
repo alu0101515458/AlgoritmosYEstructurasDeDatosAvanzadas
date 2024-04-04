@@ -1,6 +1,17 @@
+#include <cmath>
+
 #include "sequence.h"
 #pragma once
 
+/**
+ * @brief Función que realiza el std::swap de dos elementos de la secuencia NIF.
+ *
+ */
+void swapNif(StaticSequence<Nif>& sequence, int i, int j) {
+  Nif aux = sequence[i];
+  sequence[i] = sequence[j];
+  sequence[j] = aux;
+}
 /**
  * @brief Clase abstracta que define un método de ordenamiento.
  *
@@ -23,7 +34,8 @@ class SortMethod {
  * @param sequence
  */
 template <class Key>
-SortMethod<Key>::SortMethod(StaticSequence<Key>& sequence) : sequence_(sequence) {}
+SortMethod<Key>::SortMethod(StaticSequence<Key>& sequence)
+    : sequence_(sequence) {}
 
 /**
  * @brief Clase que define el método de ordenamiento por selección.
@@ -44,7 +56,8 @@ class SelectionSort : public SortMethod<Key> {
  * @param sequence
  */
 template <class Key>
-SelectionSort<Key>::SelectionSort(StaticSequence<Key>& sequence) : SortMethod<Key>(sequence) {}
+SelectionSort<Key>::SelectionSort(StaticSequence<Key>& sequence)
+    : SortMethod<Key>(sequence) {}
 
 /**
  * @brief Método que ordena la secuencia por selección.
@@ -67,9 +80,9 @@ void selectionSortCode(StaticSequence<Key>& sequence, size_t size) {
       }
     }
     // Intercambiamos el mínimo encontrado con el elemento en la posición i
-    Key x = sequence[min];
-    sequence[min] = sequence[i];
-    sequence[i] = x;
+    if (min != i) {
+      swapNif(sequence, i, min);
+    }
   }
 }
 
@@ -80,7 +93,7 @@ void selectionSortCode(StaticSequence<Key>& sequence, size_t size) {
  */
 template <class Key>
 void SelectionSort<Key>::Sort() {
-  selectionSortCode(sequence_, sequence_.getSize());
+  selectionSortCode(this->sequence_, this->sequence_.getSize());
 }
 
 /**
@@ -102,10 +115,12 @@ class HeapSort : public SortMethod<Key> {
  * @param sequence
  */
 template <class Key>
-HeapSort<Key>::HeapSort(StaticSequence<Key>& sequence) : SortMethod<Key>(sequence) {}
+HeapSort<Key>::HeapSort(StaticSequence<Key>& sequence)
+    : SortMethod<Key>(sequence) {}
 
 /**
- * @brief Código del algoritmo heapify que sirve para ordenar la secuencia por HeapSort.
+ * @brief Código del algoritmo heapify que sirve para ordenar la secuencia por
+ * HeapSort.
  *
  * @tparam Key
  */
@@ -136,7 +151,7 @@ void heapify(StaticSequence<Key>& sequence, int n, int i) {
  *
  * @tparam Key
  */
-template<class Key>
+template <class Key>
 void heapSortCode(StaticSequence<Key>& sequence, int n) {
   // Construimos el heap (reorganizamos el array)
   for (int i = n / 2 - 1; i >= 0; i--) {
@@ -158,7 +173,7 @@ void heapSortCode(StaticSequence<Key>& sequence, int n) {
  */
 template <class Key>
 void HeapSort<Key>::Sort() {
-  heapSortCode(sequence_, sequence_.getSize());
+  heapSortCode(this->sequence_, this->sequence_.getSize());
 }
 
 /**
@@ -180,17 +195,19 @@ class QuickSort : public SortMethod<Key> {
  * @param sequence
  */
 template <class Key>
-QuickSort<Key>::QuickSort(StaticSequence<Key>& sequence) : SortMethod<Key>(sequence) {}
+QuickSort<Key>::QuickSort(StaticSequence<Key>& sequence)
+    : SortMethod<Key>(sequence) {}
 
 /**
- * @brief Código del algoritmo quickSort que sirve para ordenar la secuencia por QuickSort.
+ * @brief Código del algoritmo quickSort que sirve para ordenar la secuencia por
+ * QuickSort.
  *
  * @tparam Key
  */
-template<class Key>
+template <class Key>
 void quickSortCode(StaticSequence<Key>& sequence, int ini, int fin) {
   int i = ini, f = fin;
-  Key p = sequence[(i + f) / 2]; // Pivote
+  Key p = sequence[(i + f) / 2];  // Pivote
   while (i <= f) {
     while (sequence[i] < p) i++;
     while (sequence[f] > p) f--;
@@ -200,8 +217,8 @@ void quickSortCode(StaticSequence<Key>& sequence, int ini, int fin) {
       f--;
     }
   }
-  if (ini < f) quickSort(sequence, ini, f);
-  if (i < fin) quickSort(sequence, i, fin);
+  if (ini < f) quickSortCode(sequence, ini, f);
+  if (i < fin) quickSortCode(sequence, i, fin);
 }
 
 /**
@@ -211,7 +228,7 @@ void quickSortCode(StaticSequence<Key>& sequence, int ini, int fin) {
  */
 template <class Key>
 void QuickSort<Key>::Sort() {
-  quickSortCode(sequence_, 0, sequence_.getSize() - 1);
+  quickSortCode(this->sequence_, 0, this->sequence_.getSize() - 1);
 }
 
 /**
@@ -226,7 +243,7 @@ class ShellSort : public SortMethod<Key> {
   void Sort() override;
 
  private:
-  double alpha_; 
+  double alpha_;
 };
 
 /**
@@ -236,37 +253,42 @@ class ShellSort : public SortMethod<Key> {
  * @param sequence
  */
 template <class Key>
-ShellSort<Key>::ShellSort(StaticSequence<Key>& sequence, const double& alpha) : SortMethod<Key>(sequence), alpha_(alpha) {}
+ShellSort<Key>::ShellSort(StaticSequence<Key>& sequence, const double& alpha)
+    : SortMethod<Key>(sequence), alpha_(alpha) {}
+
+/**
+ * @brief Función que ordena la secuencia por ShellSort.
+ * 
+ * @tparam Key 
+ * @param delta 
+ * @param sec 
+ * @param n 
+ */
+template <class Key>
+void deltaSort(int delta, StaticSequence<Key>& sec, int n) {
+  for (int i = delta; i < n; i++) {
+    Key x = sec[i];
+    int j = i;
+    while ((j >= delta) && (x < sec[j - delta])) {
+      sec[j] = sec[j - delta];
+      j = j - delta;
+    }
+    sec[j] = x;
+  }
+}
 
 /**
  * @brief Método que ordena la secuencia por ShellSort.
  *
- * @tparam Key
+ * @tparam T
+ * @param sec
  */
-template<typename Key>
-void shellSort(StaticSequence<Key>& sequence, int n, double alfa) {
+template <class Key>
+void shellSortCode(StaticSequence<Key>& sec, int n) {
   int delta = n;
-  // Mientras delta sea mayor que 1
   while (delta > 1) {
-    delta = static_cast<int>(delta * alfa); // Usamos alfa para calcular el nuevo delta
-    if (delta < 1) delta = 1; // Nos aseguramos que delta no sea menor que 1
-    
-    // Bucle para recorrer la secuencia
-    for (int i = delta; i < n; i++) {
-      // Seleccionamos el elemento i-ésimo
-      Key x = sequence[i];
-      // Asignamos j como el índice i
-      int j = i;
-      // Mientras podamos mover el elemento x a la izquierda y no se salga del límite
-      while ((j >= delta) && (x < sequence[j - delta])) {
-        // Movemos el elemento que está en la posición j - delta a la posición j
-        sequence[j] = sequence[j - delta];
-        // Actualizamos j
-        j = j - delta;
-      };
-      // Actualizamos la posición j con el elemento x
-      sequence[j] = x;
-    }
+    delta = delta / 2;
+    deltaSort(delta, sec, n);
   }
 }
 
@@ -280,7 +302,7 @@ void ShellSort<Key>::Sort() {
   if (alpha_ <= 0 || alpha_ >= 1) {
     throw std::invalid_argument("Alfa debe estar en el rango (0, 1)");
   }
-  shellSortCode(sequence_, sequence_.getSize(), alpha_);
+  shellSortCode(this->sequence_, this->sequence_.getSize());
 }
 
 /**
@@ -302,16 +324,17 @@ class RadixSort : public SortMethod<Key> {
  * @param sequence
  */
 template <class Key>
-RadixSort<Key>::RadixSort(StaticSequence<Key>& sequence) : SortMethod<Key>(sequence) {}
+RadixSort<Key>::RadixSort(StaticSequence<Key>& sequence)
+    : SortMethod<Key>(sequence) {}
 
 /**
  * @brief Método que ordena la secuencia por RadixSort.
  *
  * @tparam Key
  */
-template<class Key>
+template <class Key>
 void radixSortCode(StaticSequence<Key>& sequence, int n) {
-  if (n == 0) return; // Retornamos si la secuencia está vacía
+  if (n == 0) return;  // Retornamos si la secuencia está vacía
 
   // Encontramos el número máximo en la secuencia
   Key maxNumber = -1;
@@ -324,9 +347,10 @@ void radixSortCode(StaticSequence<Key>& sequence, int n) {
       maxNumber = sequence[i];
     }
   }
-  
+
   int maxDigits = 0;
-  // Encontramos el número de dígitos del número máximo para saber el número de iteraciones
+  // Encontramos el número de dígitos del número máximo para saber el número de
+  // iteraciones
   while (maxNumber > 0) {
     maxNumber /= 10;
     maxDigits++;
@@ -346,15 +370,18 @@ void radixSortCode(StaticSequence<Key>& sequence, int n) {
     }
     // Repartimos elementos en cubetas
     for (int i = 0; i < n; i++) {
-      // La fórmula para encontrar el dígito es (n / 10^d) % 10 pues 10^d es el número de dígitos
-      // que debemos movernos para encontrar el dígito deseado.
-      // Nos aseguramos de que dígitos con un número menor de dígitos se completen con 0s a la izquierda
-      // y, por ende, se ubiquen en la cubeta 0. EJ: 32 pero maxDigits = 3, entonces 32 / 10^2 = 0
-      int bucketIndex = (sequence[i] / static_cast<int>(std::pow(10, digit))) % 10;
+      // La fórmula para encontrar el dígito es (n / 10^d) % 10 pues 10^d es el
+      // número de dígitos que debemos movernos para encontrar el dígito
+      // deseado. Nos aseguramos de que dígitos con un número menor de dígitos
+      // se completen con 0s a la izquierda y, por ende, se ubiquen en la cubeta
+      // 0. EJ: 32 pero maxDigits = 3, entonces 32 / 10^2 = 0
+      int bucketIndex =
+          (sequence[i] / static_cast<int>(std::pow(10, digit))) % 10;
       // Ponemos el elemento en la cubeta correspondiente
       buckets[bucketIndex].push_back(sequence[i]);
     }
-    // Recogemos elementos de las cubetas y los ponemos de vuelta en la secuencia
+    // Recogemos elementos de las cubetas y los ponemos de vuelta en la
+    // secuencia
     int idx = 0;
     for (int i = 0; i < 10; i++) {
       for (const Key& elem : buckets[i]) {
@@ -371,5 +398,5 @@ void radixSortCode(StaticSequence<Key>& sequence, int n) {
  */
 template <class Key>
 void RadixSort<Key>::Sort() {
-  radixSortCode(sequence_, sequence_.getSize());
+  radixSortCode(this->sequence_, this->sequence_.getSize());
 }

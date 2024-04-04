@@ -18,7 +18,7 @@ class Sequence {
   virtual bool insert(const Key& k) = 0;
   virtual bool isFull() const = 0;
 
-  virtual Key operator[](const Position&) const = 0;
+  virtual Key& operator[](const Position&) = 0;
 };
 
 /**
@@ -29,19 +29,20 @@ class Sequence {
 template <class Key>
 class StaticSequence : public Sequence<Key> {
  public:
-  StaticSequence(size_t size);
+  StaticSequence(size_t, Key);
 
   size_t getSize() const;
 
-  bool search(const Key& k) const override;
-  bool insert(const Key& k) override;
+  bool search(const Key&) const override;
+  bool insert(const Key&) override;
   bool isFull() const override;
 
-  Key operator[](const Position&) const override;
+  Key& operator[](const Position&) override;
 
  private:
-  std::vector<std::optional<Key>> keys_;
-  size_t size_;
+  size_t size_; // Tamaño de la secuencia.
+  std::vector<Key> keys_; // Usamos std::optional para representar una posición vacía.
+  Key emptyValue_; // Valor que representa una posición vacía.
 };
 
 /**
@@ -49,9 +50,10 @@ class StaticSequence : public Sequence<Key> {
  *
  * @tparam Key
  * @param size_
+ * @param emptyValue
  */
 template <class Key>
-StaticSequence<Key>::StaticSequence(size_t size) : size_(size), keys_(size) {}
+StaticSequence<Key>::StaticSequence(size_t size, Key emptyValue) : size_(size), keys_(size, emptyValue), emptyValue_(emptyValue) {}
 
 /**
  * @brief Retorna el tamaño de la secuencia.
@@ -72,11 +74,7 @@ size_t StaticSequence<Key>::getSize() const { return size_; }
  */
 template <class Key>
 bool StaticSequence<Key>::search(const Key& k) const {
-  // std::any_of: Devuelve true si existe al menos k en la secuencia.
-  return std::any_of(keys_.begin(), keys_.end(),
-                     [&k](const std::optional<Key>& key) {
-                       return key.has_value() && *key == k;
-                     });
+  return std::find(keys_.begin(), keys_.end(), k) != keys_.end();
 }
 
 /**
@@ -94,17 +92,19 @@ bool StaticSequence<Key>::insert(const Key& k) {
     return false;
   }
 
-  // std::find_if: Busca la primera posición vacía en la secuencia.
-  auto it = std::find_if(
-      keys_.begin(), keys_.end(),
-      [](const std::optional<Key>& key) { return !key.has_value(); });
-
-  // Si se encontró una posición vacía, se inserta la clave.
-  if (it != keys_.end()) {
-    *it = k;
-    return true;
+  // Si la clave ya está en la secuencia, no se puede insertar.
+  if (search(k)) {
+    return false;
   }
 
+  // Buscamos la primera posición vacía.
+  for (size_t i = 0; i < size_; i++) {
+    if (keys_[i] == emptyValue_) {
+      keys_[i] = k;
+      return true;
+    }
+  }
+  
   return false;
 }
 
@@ -117,10 +117,7 @@ bool StaticSequence<Key>::insert(const Key& k) {
  */
 template <class Key>
 bool StaticSequence<Key>::isFull() const {
-  // std::none_of: Devuelve true si no existe ninguna posición vacía en la secuencia.
-  return std::none_of(
-      keys_.begin(), keys_.end(),
-      [](const std::optional<Key>& key) { return !key.has_value(); });
+  return std::find(keys_.begin(), keys_.end(), emptyValue_) == keys_.end();
 }
 
 /**
@@ -131,11 +128,9 @@ bool StaticSequence<Key>::isFull() const {
  * @return Key
  */
 template <class Key>
-Key StaticSequence<Key>::operator[](const Position& position) const {
-  // Si la posición es mayor o igual al tamaño de la secuencia o la posición está vacía, se lanza una excepción.
-  if (position >= size_ || !keys_[position].has_value()) {
-    throw std::out_of_range("La posición a la que se quiere acceder no existe o está vacía.");
+Key& StaticSequence<Key>::operator[](const Position& position) {
+  if (position < 0 || position >= static_cast<int>(size_)) {
+    throw std::out_of_range("Índice fuera de rango");
   }
-  // Se retorna la clave en la posición p.
-  return *keys_[position];
+  return keys_[position];
 }
