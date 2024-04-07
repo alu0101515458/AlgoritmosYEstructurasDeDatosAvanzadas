@@ -29,13 +29,18 @@ class Sequence {
 template <class Key>
 class StaticSequence : public Sequence<Key> {
  public:
-  StaticSequence(size_t, Key);
+  StaticSequence(size_t, Key, bool);
 
   size_t getSize() const;
+  bool getTrace() const;
+
+  void setTrace(bool);
 
   bool search(const Key&) const override;
   bool insert(const Key&) override;
   bool isFull() const override;
+
+  void print() const;
 
   Key& operator[](const Position&) override;
 
@@ -43,6 +48,7 @@ class StaticSequence : public Sequence<Key> {
   size_t size_; // Tamaño de la secuencia.
   std::vector<Key> keys_; // Usamos std::optional para representar una posición vacía.
   Key emptyValue_; // Valor que representa una posición vacía.
+  bool trace_; // Indica si se debe mostrar la secuencia.
 };
 
 /**
@@ -53,7 +59,7 @@ class StaticSequence : public Sequence<Key> {
  * @param emptyValue
  */
 template <class Key>
-StaticSequence<Key>::StaticSequence(size_t size, Key emptyValue) : size_(size), keys_(size, emptyValue), emptyValue_(emptyValue) {}
+StaticSequence<Key>::StaticSequence(size_t size, Key emptyValue, bool trace) : size_(size), keys_(size, emptyValue), emptyValue_(emptyValue), trace_(trace) {}
 
 /**
  * @brief Retorna el tamaño de la secuencia.
@@ -63,6 +69,25 @@ StaticSequence<Key>::StaticSequence(size_t size, Key emptyValue) : size_(size), 
  */
 template <class Key>
 size_t StaticSequence<Key>::getSize() const { return size_; }
+
+/**
+ * @brief Retorna si se debe mostrar la secuencia.
+ *
+ * @tparam Key
+ * @return true Si se debe mostrar la secuencia.
+ * @return false Si no se debe mostrar la secuencia.
+ */
+template <class Key>
+bool StaticSequence<Key>::getTrace() const { return trace_; }
+
+/**
+ * @brief Establece si se debe mostrar la secuencia.
+ *
+ * @tparam Key
+ * @param trace
+ */
+template <class Key>
+void StaticSequence<Key>::setTrace(bool trace) { trace_ = trace; }
 
 /**
  * @brief Busca una clave en la secuencia.
@@ -118,6 +143,18 @@ bool StaticSequence<Key>::insert(const Key& k) {
 template <class Key>
 bool StaticSequence<Key>::isFull() const {
   return std::find(keys_.begin(), keys_.end(), emptyValue_) == keys_.end();
+}
+
+/**
+ * @brief Función que imprime la secuencia.
+ * 
+ */
+template <class Key>
+void StaticSequence<Key>::print() const {
+  for (size_t i = 0; i < size_; i++) {
+    std::cout << "> " << this->keys_[i] << " ";
+  }
+  std::cout << std::endl;
 }
 
 /**

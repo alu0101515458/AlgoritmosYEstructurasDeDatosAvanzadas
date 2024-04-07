@@ -1,5 +1,4 @@
 #include <cmath>
-
 #include "sequence.h"
 #pragma once
 
@@ -7,8 +6,9 @@
  * @brief Función que realiza el std::swap de dos elementos de la secuencia NIF.
  *
  */
-void swapNif(StaticSequence<Nif>& sequence, int i, int j) {
-  Nif aux = sequence[i];
+template <class Key>
+void swapNif(StaticSequence<Key>& sequence, int i, int j) {
+  Key aux = sequence[i];
   sequence[i] = sequence[j];
   sequence[j] = aux;
 }
@@ -68,6 +68,7 @@ SelectionSort<Key>::SelectionSort(StaticSequence<Key>& sequence)
  */
 template <class Key>
 void selectionSortCode(StaticSequence<Key>& sequence, size_t size) {
+  if (sequence.getTrace()) sequence.print();
   // Bucle para recorrer la secuencia
   for (size_t i = 0; i < size - 1; i++) {
     // Inicializamos el mínimo en la posición i
@@ -83,6 +84,7 @@ void selectionSortCode(StaticSequence<Key>& sequence, size_t size) {
     if (min != i) {
       swapNif(sequence, i, min);
     }
+    if (sequence.getTrace()) sequence.print();
   }
 }
 
@@ -157,12 +159,16 @@ void heapSortCode(StaticSequence<Key>& sequence, int n) {
   for (int i = n / 2 - 1; i >= 0; i--) {
     heapify(sequence, n, i);
   }
+
+  if (sequence.getTrace()) sequence.print();
+
   // Uno por uno extraemos un elemento del heap
   for (int i = n - 1; i > 0; i--) {
     // Movemos la raíz actual al final
     std::swap(sequence[0], sequence[i]);
     // llamamos a heapify en el heap reducido
     heapify(sequence, i, 0);
+    if (sequence.getTrace()) sequence.print();
   }
 }
 
@@ -217,6 +223,9 @@ void quickSortCode(StaticSequence<Key>& sequence, int ini, int fin) {
       f--;
     }
   }
+
+  if (sequence.getTrace()) sequence.print();
+
   if (ini < f) quickSortCode(sequence, ini, f);
   if (i < fin) quickSortCode(sequence, i, fin);
 }
@@ -289,6 +298,7 @@ void shellSortCode(StaticSequence<Key>& sec, int n) {
   while (delta > 1) {
     delta = delta / 2;
     deltaSort(delta, sec, n);
+    if (sec.getTrace()) sec.print();
   }
 }
 
@@ -349,8 +359,7 @@ void radixSortCode(StaticSequence<Key>& sequence, int n) {
   }
 
   int maxDigits = 0;
-  // Encontramos el número de dígitos del número máximo para saber el número de
-  // iteraciones
+  // Encontramos el número de dígitos del número máximo para saber el número de iteraciones
   while (maxNumber > 0) {
     maxNumber /= 10;
     maxDigits++;
@@ -388,6 +397,7 @@ void radixSortCode(StaticSequence<Key>& sequence, int n) {
         sequence[idx++] = elem;
       }
     }
+    if (sequence.getTrace()) sequence.print();
   }
 }
 
