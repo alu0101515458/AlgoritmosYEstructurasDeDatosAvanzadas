@@ -75,6 +75,7 @@ void selectionSortCode(StaticSequence<Key>& sequence, size_t size) {
     size_t min = i;
     // Bucle para encontrar el mínimo en el resto de la secuencia
     for (size_t j = i + 1; j < size; j++) {
+      sequence.countComparisons();
       // Comparamos los elementos para encontrar el mínimo
       if (sequence[j] < sequence[min]) {
         min = j;
@@ -215,8 +216,14 @@ void quickSortCode(StaticSequence<Key>& sequence, int ini, int fin) {
   int i = ini, f = fin;
   Key p = sequence[(i + f) / 2];  // Pivote
   while (i <= f) {
-    while (sequence[i] < p) i++;
-    while (sequence[f] > p) f--;
+    while (sequence[i] < p) {
+      i++;
+      sequence.countComparisons();
+    }
+    while (sequence[f] > p) {
+      f--;
+      sequence.countComparisons();
+    }
     if (i <= f) {
       std::swap(sequence[i], sequence[f]);
       i++;

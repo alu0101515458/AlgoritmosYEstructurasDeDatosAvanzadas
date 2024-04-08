@@ -123,7 +123,7 @@ int processInitFile(const std::string filename, StaticSequence<Nif>& sequence, u
 int main(int argc, char *argv[]) {
   Usage(argc, argv);
   StaticSequence<Nif> sequence(std::atoi(argv[2]), -1, false);
-  // Si argc es 8, contiene: './program -size <n> -ord <radix|selection|quick|heap|shell> -init <manual|random> -trace <y|n>'
+  // Si argc es 9, contiene: './program -size <n> -ord <radix|selection|quick|heap|shell> -init <manual|random> -trace <y|n>'
   if (argc == 9) {
     if (std::string(argv[4]) == "radix") {
       if (std::string(argv[6]) == "manual") {
