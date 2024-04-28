@@ -1,4 +1,5 @@
-#include "nodoB.h"
+#include "nodob.h"
+#include "nodoavl.h"
 #include <iostream>
 #include <ostream>
 #include <queue>
@@ -24,6 +25,8 @@ class ArbolB {
 	ArbolB(const std::vector<Key>&);
   ~ArbolB();
 
+	virtual bool insertar(const Key&) = 0;
+	virtual bool buscar(const Key&) const = 0;
 	void podar(NodoB<Key>*);
 	bool esVacio(const NodoB<Key>*) const;
 	bool esHoja(const NodoB<Key>*) const;
@@ -34,19 +37,24 @@ class ArbolB {
   void recorrerInorden(const NodoB<Key>*) const;
   void recorrerPreorden(const NodoB<Key>*, std::vector<Key>&) const;
   void recorrerPostorden(const NodoB<Key>*) const;
-	std::ostream& recorrerNiveles(NodoB<Key>*, std::ostream& os) const;
+	std::ostream& recorrerNiveles(NodoAVL<Key>*, std::ostream& os) const;
 
 	NodoB<Key>* getRaiz() const;
 	NodoB<Key>** getRaizPtr(); 
+	bool getTraza() const;
 	int getTamano() const;
 	int getTamanoRama(NodoB<Key>*) const;
 	int getAltura() const;
 	int getAlturaNodo(NodoB<Key>*) const;
+	bool balanceado() const;
+	bool balanceRama(NodoB<Key>*) const;
 
 	void setRaiz(NodoB<Key>*);
+	void setTraza(const bool&);
 
- private:
+ protected:
   NodoB<Key>* nodo;
+	bool traza_ = false;
 };
 
 /**
@@ -118,8 +126,6 @@ bool ArbolB<Key>::esVacio(const NodoB<Key>* nodo) const { return nodo == nullptr
  */
 template <class Key>
 bool ArbolB<Key>::esHoja(const NodoB<Key>* nodo) const { return nodo != nullptr && nodo->getIzdo() == nullptr && nodo->getDcho() == nullptr; }
-
-
 
 /**
  * @brief Función que inserta un dato en el árbol de forma balanceada
@@ -246,30 +252,30 @@ void ArbolB<Key>::recorrerPostorden(const NodoB<Key>* nodo) const {
  * @param os Stream de salida
  */
 template <class Key>
-std::ostream& ArbolB<Key>::recorrerNiveles(NodoB<Key>* nodo, std::ostream& os) const {
+std::ostream& ArbolB<Key>::recorrerNiveles(NodoAVL<Key>* nodo, std::ostream& os) const {
 	// Manejo explícito del árbol vacío.
 	if (nodo == nullptr) {
-    os << "Nivel " << BOLD << MAGENTA << "0" << RESET << ": [.] " << std::endl;
+		os << "Nivel " << BOLD << MAGENTA << "0" << RESET << ": [.] " << std::endl;
 		return os;
-  } 
+	}
 
-	// Usamos una cola para recorrer los nodos por niveles.
-	std::queue<std::pair<NodoB<Key>*, int>> Q;
+	// Cola de nodos.
+	std::queue<std::pair<NodoAVL<Key>*, int>> Q;
+
 	int nivelActual = 0;
-
 	os << "Nivel " << BOLD << MAGENTA << nivelActual << RESET << ": ";
 
 	// Insertamos la raíz del árbol en la cola con nivel 0.
-	Q.push({nodo, 0});
+	Q.push({nodo, nivelActual});
 
 	// Mientras la cola no esté vacía, procesamos los nodos.
 	while (!Q.empty()) {
 		// Extraemos y eliminamos el nodo de la cola.
-		std::pair<NodoB<Key>*, int> nodoInfo = Q.front();
+		std::pair<NodoAVL<Key>*, int> nodoInfo = Q.front();
 		Q.pop();
 
 		// Extraemos el nodo y el nivel del nodo.
-		NodoB<Key>* nodo_aux = nodoInfo.first;
+		NodoAVL<Key>* nodo_aux = nodoInfo.first;
 		int nivel = nodoInfo.second;
 
 		// Si estamos en un nuevo nivel, actualizamos nivelActual.
@@ -280,7 +286,8 @@ std::ostream& ArbolB<Key>::recorrerNiveles(NodoB<Key>* nodo, std::ostream& os) c
 
 		// Si el nodo no es nullptr, lo procesamos.
 		if (nodo_aux != nullptr) {
-			os << nodo_aux->getDato() << " ";
+			if (traza_) os << "[" << nodo_aux->getClave() << " (" << nodo_aux->getBal() << ")] ";
+			else os << "[" <<  nodo_aux->getDato() << "] ";
 			// Insertar hijo izquierdo y derecho en la cola, incluso si son nullptr.
 			Q.push({nodo_aux->getIzdo(), nivel + 1});
 			Q.push({nodo_aux->getDcho(), nivel + 1});
@@ -309,6 +316,15 @@ NodoB<Key>* ArbolB<Key>::getRaiz() const { return nodo; }
  */
 template <class Key>
 NodoB<Key>** ArbolB<Key>::getRaizPtr() { return &nodo; }
+
+/**
+ * @brief Función que devuelve la traza del árbol
+ * 
+ * @tparam Key Dato a procesar
+ * @return const bool Traza del árbol
+ */
+template <class Key>
+bool ArbolB<Key>::getTraza() const { return traza_; }
 
 /**
  * @brief Función que devuelve el tamaño del árbol
@@ -360,6 +376,41 @@ int ArbolB<Key>::getAlturaNodo(NodoB<Key>* nodo) const {
 }
 
 /**
+ * @brief Función que comprueba si un árbol está balanceado
+ * 
+ * @tparam Key Dato a procesar
+ * @return true Si el árbol está balanceado
+ * @return false Si el árbol no está balanceado
+ */
+template <class Key>
+bool ArbolB<Key>::balanceado() const { return balanceRama(getRaiz()); }
+
+/**
+ * @brief Función que comprueba si una rama de un árbol está balanceada
+ * 
+ * @tparam Key Dato a procesar
+ * @param nodo Nodo a procesar
+ * @return true Si la rama está balanceada
+ * @return false Si la rama no está balanceada
+ */
+template <class Key>
+bool ArbolB<Key>::balanceRama(NodoB<Key>* nodo) const {
+	// Si el nodo es nullptr, la rama está balanceada.
+	if (nodo == nullptr) return true;
+	// Calculamos el balance de la rama.
+	int bal = getAlturaNodo(nodo->getIzdo()) - getAlturaNodo(nodo->getDcho());
+	// Comprobamos si el balance es -1, 0 o 1.
+	switch (bal) {
+		case -1:
+		case 0:
+		case 1:
+			// Si el balance es -1, 0 o 1, la rama está balanceada. Llamamos a la función recursivamente para comprobar el resto de la rama.
+			return balanceRama(nodo->getIzdo()) && balanceRama(nodo->getDcho());
+		default: return false;
+	}
+}
+
+/**
  * @brief Función que establece la raíz del árbol
  * 
  * @tparam Key Dato a procesar
@@ -367,6 +418,15 @@ int ArbolB<Key>::getAlturaNodo(NodoB<Key>* nodo) const {
  */
 template <class Key>
 void ArbolB<Key>::setRaiz(NodoB<Key>* nodo) { this->nodo = nodo; }
+
+/**
+ * @brief Función que establece la traza del árbol
+ * 
+ * @tparam Key Dato a procesar
+ * @param traza Traza del árbol
+ */
+template <class Key>
+void ArbolB<Key>::setTraza(const bool& traza) { this->traza_ = traza; }
 
 /**
  * @brief Sobrecarga del operador de inserción
@@ -379,6 +439,6 @@ void ArbolB<Key>::setRaiz(NodoB<Key>* nodo) { this->nodo = nodo; }
 template <class Key>
 std::ostream& operator<<(std::ostream& os, const ArbolB<Key>& arbol) {
 	// Recorremos el árbol por niveles.
-	std::cout << std::endl;
-	return arbol.recorrerNiveles(arbol.getRaiz(), os);
+	os << std::endl;
+	return arbol.recorrerNiveles(static_cast<NodoAVL<Key>*>(arbol.getRaiz()), os);
 }

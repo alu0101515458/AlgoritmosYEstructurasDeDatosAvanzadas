@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Werror -Wextra -pedantic -std=c++17 -fmax-errors=1 -g
+CXXFLAGS = -Wall -Werror -Wextra -pedantic -std=c++17
 LDFLAGS =
 
 SRC = src/nif.cc src/client.cc

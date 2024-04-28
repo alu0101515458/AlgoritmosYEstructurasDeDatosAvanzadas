@@ -28,50 +28,50 @@ void usage(int argc, char *argv[]) {
   bool ab = false;
   bool initFound = false;
   if (argc == 1) {
-    std::cout << BOLD << RED "No se han introducido argumentos." << std::endl;
-    exit(EXIT_FAILURE);
+	std::cout << BOLD << RED "No se han introducido argumentos." << std::endl;
+	exit(EXIT_FAILURE);
   }
   for (int i = 1; i < argc; ++i) { // Comenzamos en 1 para omitir el nombre del programa
-    std::string arg = argv[i];
-    if (arg == "-h" || arg == "--help") {
-      std::cout << BOLD << "Uso: ./program -ab <abe|abb> -init <i> [s][f]" << std::endl;
-      std::cout << "Opciones:" << std::endl;
-      std::cout << "-ab <abe|abb> : Tipo de Árbol. NECESARIO" << std::endl;
-      std::cout << "-init <i> [s][f] : Maneras de inicializar el Nif. NECESARIO" << std::endl;
+	std::string arg = argv[i];
+	if (arg == "-h" || arg == "--help") {
+	  std::cout << BOLD << "Uso: ./program -ab <abe|abb> -init <i> [s][f]" << std::endl;
+	  std::cout << "Opciones:" << std::endl;
+	  std::cout << "-ab <abe|abb> : Tipo de Árbol. NECESARIO" << std::endl;
+	  std::cout << "-init <i> [s][f] : Maneras de inicializar el Nif. NECESARIO" << std::endl;
 			std::cout << "\ti=manual" << std::endl;
 			std::cout << "\ti=random [s], s es el número de elementos a generar" << std::endl;
 			std::cout << "\ti==file [s][f], s es el número de elementos a generar, f es nombre del fichero de entrada" << std::endl;
-      exit(EXIT_SUCCESS);
-    } else if (arg == "-ab") {
-      if (i + 1 >= argc) {
-        std::cout << BOLD << RED << "No se ha introducido un tamaño válido para '-ab'." << std::endl;
-        exit(EXIT_FAILURE);
-      } else {
+	  exit(EXIT_SUCCESS);
+	} else if (arg == "-ab") {
+	  if (i + 1 >= argc) {
+		std::cout << BOLD << RED << "No se ha introducido un tamaño válido para '-ab'." << std::endl;
+		exit(EXIT_FAILURE);
+	  } else {
 				if (std::string(argv[i + 1]) != "abe" && std::string(argv[i + 1]) != "abb") {
 					std::cout << BOLD << RED << "Tipo de árbol no válido." << std::endl;
 					exit(EXIT_FAILURE);
 				}
-        ab = true;
-        ++i; // Saltamos el valor de este argumento
-      }
-    } else if (arg == "-init") {
-      if (i + 1 >= argc) {
-        std::cout << BOLD << RED << "No se ha introducido una opción para '-init'." << RESET << std::endl;
-        std::cout << "Opciones: 'manual' o 'random [s]' o 'file [s] <fichero>'." << std::endl;
-        exit(EXIT_FAILURE);
-      } else {
+		ab = true;
+		++i; // Saltamos el valor de este argumento
+	  }
+	} else if (arg == "-init") {
+	  if (i + 1 >= argc) {
+		std::cout << BOLD << RED << "No se ha introducido una opción para '-init'." << RESET << std::endl;
+		std::cout << "Opciones: 'manual' o 'random [s]' o 'file [s] <fichero>'." << std::endl;
+		exit(EXIT_FAILURE);
+	  } else {
 				if (std::string(argv[i + 1]) != "manual" && std::string(argv[i + 1]) != "random" && std::string(argv[i + 1]) != "file") {
 					std::cout << BOLD << RED << "Opción de inicialización no válida." << std::endl;
 					exit(EXIT_FAILURE);
 				}
-        ++i; // Saltamos el valor de este argumento
-        initFound = true;
-      }
-    }
+		++i; // Saltamos el valor de este argumento
+		initFound = true;
+	  }
+	}
   }
   if (!ab || !initFound) {
-    std::cout << BOLD << "Faltan argumentos obligatorios." << std::endl;
-    exit(EXIT_FAILURE);
+	std::cout << BOLD << "Faltan argumentos obligatorios." << std::endl;
+	exit(EXIT_FAILURE);
   }
 }
 
@@ -86,8 +86,8 @@ std::vector<Nif> processInitFile(const std::string filename, unsigned expectedSi
   // Abrimos el fichero.
   std::ifstream file(filename);
   if (!file.is_open()) {
-    std::cout << BOLD << RED << "El fichero no se ha podido abrir." << std::endl;
-    exit(EXIT_FAILURE);
+	std::cout << BOLD << RED << "El fichero no se ha podido abrir." << std::endl;
+	exit(EXIT_FAILURE);
   }
 	// Creamos un vector auxiliar para almacenar los NIFs.
   std::vector<Nif> aux;

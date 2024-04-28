@@ -7,12 +7,9 @@
  * Representa un árbol binario equilibrado.
  */
 template <class Key>
-class ArbolBE {
+class ArbolBE : public ArbolB<Key> {
  public:
   ArbolBE();
-  ArbolBE(const ArbolB<Key>&);
-	ArbolBE(const ArbolBE<Key>&);
-	ArbolBE(const std::vector<Key>&);
   ~ArbolBE();
 
 	bool buscar(const Key& dat) const;
@@ -22,47 +19,19 @@ class ArbolBE {
 	bool equilibrioRama(NodoB<Key>*) const;
 	bool balanceado() const;
 	bool balanceRama(NodoB<Key>*) const;
-
-	ArbolB<Key>* getArbolB() const;
-  
- private:
-  ArbolB<Key>* arbolB;
 };
 
 /**
  * @brief Constructor de la clase árbol binario equilibrado
  */
 template <class Key>
-ArbolBE<Key>::ArbolBE() : arbolB(new ArbolB<Key>()) {}
-
-/**
- * @brief Constructor de copia de la clase árbol binario equilibrado
- * @param arbol Árbol a copiar
- */
-template <class Key>
-ArbolBE<Key>::ArbolBE(const ArbolB<Key>& arbol) : arbolB(new ArbolB<Key>(arbol)) {}
-
-/**
- * @brief Constructor de copia de la clase árbol binario equilibrado
- * @param arbol Árbol a copiar
- */
-template <class Key>
-ArbolBE<Key>::ArbolBE(const ArbolBE<Key>& arbol) : arbolB(new ArbolB<Key>(*(arbol.arbolB))) {}
-
-/**
- * @brief Constructor de la clase árbol binario equilibrado
- * @param datos Vector de datos a insertar
- */
-template <class Key>
-ArbolBE<Key>::ArbolBE(const std::vector<Key>& datos) : arbolB(new ArbolB<Key>()) {
-	for (const Key& dat : datos) insertar(dat);
-}
+ArbolBE<Key>::ArbolBE() : ArbolB<Key>() {}
 
 /**
  * @brief Destructor de la clase árbol binario equilibrado
  */
 template <class Key>
-ArbolBE<Key>::~ArbolBE() { delete arbolB; }
+ArbolBE<Key>::~ArbolBE() {}
 
 /**
  * @brief Función que busca un dato en el árbol
@@ -75,7 +44,7 @@ ArbolBE<Key>::~ArbolBE() { delete arbolB; }
 template <class Key>
 bool ArbolBE<Key>::buscar(const Key& dat) const { 
 	std::vector<Key> datos;
-	arbolB->recorrerPreorden(arbolB->getRaiz(), datos);
+	this->recorrerPreorden(this->getRaiz(), datos);
 	for (const Key& dato : datos) if (dato == dat) return true;
 	return false;
 }
@@ -90,7 +59,7 @@ bool ArbolBE<Key>::insertar(const Key& dat) {
 	// Si el dato ya existe, no se inserta.
 	if (buscar(dat)) return false;
 	// Obtenemos un puntero a puntero hacia la raíz del árbol.
-  return insertarRama(arbolB->getRaizPtr(), dat); // Insertamos el nodo en el árbol.
+  return insertarRama(this->getRaizPtr(), dat); // Insertamos el nodo en el árbol.
 }
 
 /**
@@ -105,9 +74,10 @@ bool ArbolBE<Key>::insertarRama(NodoB<Key>** nodo, const Key& dat) {
 	// Si el nodo es nullptr, insertamos el nodo en la rama.
 	if (*nodo == nullptr) {
     *nodo = new NodoB<Key>(dat);
+		std::cout << *this;
     return true;
   } else {
-		if (arbolB->getAlturaNodo((*nodo)->getIzdo()) <= arbolB->getAlturaNodo((*nodo)->getDcho())) return insertarRama((*nodo)->getIzdoPtr(), dat);
+		if (this->getAlturaNodo((*nodo)->getIzdo()) <= this->getAlturaNodo((*nodo)->getDcho())) return insertarRama((*nodo)->getIzdoPtr(), dat);
 		else return insertarRama((*nodo)->getDchoPtr(), dat);
   }
 	return false;
@@ -121,7 +91,7 @@ bool ArbolBE<Key>::insertarRama(NodoB<Key>** nodo, const Key& dat) {
  * @return false Si el árbol no está equilibrado
  */
 template <class Key>
-bool ArbolBE<Key>::equilibrado() const { return equilibrioRama(arbolB->getRaiz()); }
+bool ArbolBE<Key>::equilibrado() const { return equilibrioRama(this->getRaiz()); }
 
 /**
  * @brief Función que comprueba si una rama de un árbol está equilibrada
@@ -136,7 +106,7 @@ bool ArbolBE<Key>::equilibrioRama(NodoB<Key>* nodo) const {
 	// Si el nodo es nullptr, la rama está equilibrada.
 	if (nodo == nullptr) return true;
 	// Calculamos el equilibrio de la rama.
-	int eq = arbolB->getTamanoRama(nodo->getIzdo()) - arbolB->getTamanoRama(nodo->getDcho());
+	int eq = getTamanoRama(nodo->getIzdo()) - getTamanoRama(nodo->getDcho());
 	// Comprobamos si el equilibrio es -1, 0 o 1.
 	switch (eq) {
 		case -1:
@@ -156,7 +126,7 @@ bool ArbolBE<Key>::equilibrioRama(NodoB<Key>* nodo) const {
  * @return false Si el árbol no está balanceado
  */
 template <class Key>
-bool ArbolBE<Key>::balanceado() const { return balanceRama(arbolB->getRaiz()); }
+bool ArbolBE<Key>::balanceado() const { return balanceRama(this->getRaiz()); }
 
 /**
  * @brief Función que comprueba si una rama de un árbol está balanceada
@@ -171,7 +141,7 @@ bool ArbolBE<Key>::balanceRama(NodoB<Key>* nodo) const {
 	// Si el nodo es nullptr, la rama está balanceada.
 	if (nodo == nullptr) return true;
 	// Calculamos el balance de la rama.
-	int bal = arbolB->getAlturaNodo(nodo->getIzdo()) - arbolB->getAlturaNodo(nodo->getDcho());
+	int bal = getAlturaNodo(nodo->getIzdo()) - getAlturaNodo(nodo->getDcho());
 	// Comprobamos si el balance es -1, 0 o 1.
 	switch (bal) {
 		case -1:
@@ -182,12 +152,3 @@ bool ArbolBE<Key>::balanceRama(NodoB<Key>* nodo) const {
 		default: return false;
 	}
 }
-
-/**
- * @brief Función que devuelve el árbol binario subyacente
- * 
- * @tparam Key Dato a procesar
- * @return ArbolB<Key>* Árbol binario subyacente
- */
-template <class Key>
-ArbolB<Key>* ArbolBE<Key>::getArbolB() const { return arbolB; }

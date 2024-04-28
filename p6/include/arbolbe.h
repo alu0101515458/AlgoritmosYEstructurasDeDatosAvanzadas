@@ -105,6 +105,7 @@ bool ArbolBE<Key>::insertarRama(NodoB<Key>** nodo, const Key& dat) {
 	// Si el nodo es nullptr, insertamos el nodo en la rama.
 	if (*nodo == nullptr) {
     *nodo = new NodoB<Key>(dat);
+		std::cout << *this->arbolB << std::endl;
     return true;
   } else {
 		if (arbolB->getAlturaNodo((*nodo)->getIzdo()) <= arbolB->getAlturaNodo((*nodo)->getDcho())) return insertarRama((*nodo)->getIzdoPtr(), dat);

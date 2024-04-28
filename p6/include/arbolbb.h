@@ -80,6 +80,7 @@ bool ArbolBB<Key>::insertar(const Key& dat) {
   }
 	// Insertar el nuevo nodo.
   *aux = new NodoB<Key>(dat); // Insertar el nuevo nodo.
+  std::cout << *this->arbolB << std::endl; // Mostrar el árbol.
   return true; // La inserción fue exitosa.
 }
 
